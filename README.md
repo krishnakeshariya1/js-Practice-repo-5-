@@ -1,0 +1,1 @@
+Day 1 :- Write code of simple guessing game app using If, else if, and input validations So i can have great understanding of conditional statements. I don't use Loops bcz i just need to practice the conditional statements but next day i'll make same program using Loops.
