@@ -21,19 +21,19 @@ guessBtn.addEventListener("click", () => {
 
     const guessVal = Number(guessInput.value);
 
-    if (!isValidInput(guessVal, 1, 50)) {
+    if (!isValideInput(guessVal, 1, 50)) {
         messagePara.textContent = "Invalid input";
         guessInput.value = "";
         return;
     }
 
-    if (guessVals.includes(guessVal)) {
+    if (GuessVals.includes(guessVal)) {
         messagePara.textContent = "Already guessed";
         guessInput.value = "";
         return;
     }
 
-    guessVals.push(guessVal);
+    GuessVals.push(guessVal);
 
     if (guessVal === randomVal) {
         messagePara.textContent = "You guessed it right! You won 🎉";
@@ -47,7 +47,7 @@ guessBtn.addEventListener("click", () => {
     }
 
     attemptPara.textContent = `You have ${attempts} attempts left`;
-    historyPara.textContent = `Your guesses: ${guessVals}`;
+    historyPara.textContent = `Your guesses: ${GuessVals}`;
     guessInput.value = "";
 
     if (attempts === 0 && !isGameOver) {
