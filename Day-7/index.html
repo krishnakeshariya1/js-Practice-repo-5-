@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Number - Day 7</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 500px;
+            margin: auto;
+        }
+        input, select, button {
+            padding: 10px;
+            margin: 5px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        #message {
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        #attempts, #history {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Guess the Number Game</h1>
+
+    <label for="difficulty">Select Difficulty:</label>
+    <select id="difficulty">
+        <option value="easy">Easy (1-50, 10 attempts)</option>
+        <option value="medium">Medium (1-100, 7 attempts)</option>
+        <option value="hard">Hard (1-200, 5 attempts)</option>
+    </select>
+
+    <input type="number" id="inputBox" placeholder="Enter your guess">
+    <button id="guessBtn">Guess</button>
+    <button id="reset">Reset Game</button>
+
+    <p id="message">Game has not started yet.</p>
+    <p id="attempts">Attempts left: 0</p>
+    <p id="history">Your guesses: </p>
+
+    <script src="script.js"></script>
+</body>
+</html>
