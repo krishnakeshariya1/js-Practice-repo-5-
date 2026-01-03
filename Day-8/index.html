@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Guessing Game - opJs12</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f2f2f2;
+        }
+        #gameContainer {
+            background: white;
+            padding: 20px 40px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        input, select, button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+        }
+        #message {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        #attempts, #history {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="gameContainer">
+        <h1>Number Guessing Game</h1>
+        
+        <label for="difficulty">Select Difficulty:</label>
+        <select id="difficulty">
+            <option value="easy">Easy (1-50, 10 attempts)</option>
+            <option value="medium">Medium (1-100, 7 attempts)</option>
+            <option value="hard">Hard (1-200, 5 attempts)</option>
+        </select>
+        <br>
+
+        <input type="number" id="inputBox" placeholder="Enter your guess" />
+        <button id="guessBtn">Guess</button>
+        <button id="reset">Reset Game</button>
+
+        <p id="message">Welcome! Select a difficulty and start guessing.</p>
+        <p id="attempts">Attempts left: 0</p>
+        <p id="history">Your guesses: </p>
+    </div>
+
+    <!-- Link your JS file here -->
+    <script src="script.js"></script>
+
+</body>
+</html>
