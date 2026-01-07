@@ -1,66 +1,88 @@
+// ===== DOM REFERENCES =====
 const inputName = document.querySelector("#taskName");
 const inputCategory = document.querySelector("#taskCategory");
 const addTaskBtn = document.querySelector("#addTaskBtn");
 const taskContainer = document.querySelector(".taskContainer");
+const categoryFilter = document.querySelector("#filterCategory");
 
-// Load tasks from localStorage or start with empty array
-let taskArray = (JSON.parse(localStorage.getItem("tasks")) || []);
+let taskArray = JSON.parse(localStorage.getItem("tasks")) || [];
 
-// Add task
 function handleInput() {
-    const taskName = inputName.value.trim();
-    const taskCateg = inputCategory.value.trim();
+    const name = inputName.value.trim();
+    const category = inputCategory.value.trim().toLowerCase();
 
-    if (!taskName || !taskCateg) return; // ignore empty inputs
+    if (!name || !category) return;
 
     const task = {
-        name: taskName,
-        category: taskCateg,
+        id: Date.now(),
+        name,
+        category,
         isDone: false
     };
 
     taskArray.push(task);
-    addToLocalstorage()
+    saveAndRender();
 
     inputName.value = "";
-    inputCategory.value = "";
-
-    renderCard();
+    inputCategory.selectedIndex = 0;
 }
-function renderCard() {
-    if (taskArray.length === 0) {
-        taskContainer.innerHTML = "<p class='para'>No tasks added</p>";
+
+function renderCard(tasks = taskArray) {
+    if (tasks.length === 0) {
+        taskContainer.innerHTML = `<p class="para">No tasks found</p>`;
         return;
     }
 
-    let html ="";
-    taskArray.forEach((task, index) => {
-        html +=`
-        <div class="task ${task.isDone ? "done" : "unDone"}">
-            <div class="rightContent">
-                <h3>${task.name}</h3>
-                <h4>${task.category}</h4>
+    let html = "";
+
+    tasks.forEach(task => {
+        html += `
+            <div class="task ${task.isDone ? "done" : "unDone"}">
+                <div class="rightContent">
+                    <h3>${task.name}</h3>
+                    <h4>${task.category}</h4>
+                </div>
+                <div class="leftContent">
+                    <button onclick="toggleDone(${task.id})" class="doneBtn">
+                        ${task.isDone ? "Undo" : "Done"}
+                    </button>
+                    <button onclick="deleteTask(${task.id})">Delete</button>
+                </div>
             </div>
-            <div class="leftContent">
-                <button onclick="markDone(${index})" class="">Done</button>
-                <button onclick="deleteTask(${index})">Delete</button>
-            </div>
-        </div>`;
-        taskContainer.innerHTML = html
+        `;
     });
+
+    taskContainer.innerHTML = html;
 }
-function deleteTask(indx) {
-    taskArray.splice(indx, 1);
-    addToLocalstorage()
-    renderCard();
+
+function deleteTask(id) {
+    taskArray = taskArray.filter(task => task.id !== id);
+    saveAndRender();
 }
-function markDone(indx) {
-   taskArray[indx].isDone = true;
-   addToLocalstorage()
-   renderCard();
+
+function toggleDone(id) {
+    const task = taskArray.find(task => task.id === id);
+    if (task) task.isDone = !task.isDone;
+    saveAndRender();
 }
+
+function applyFilters() {
+    let result = [...taskArray];
+
+    const categoryValue = categoryFilter.value.toLowerCase();
+
+    if (categoryValue !== "all") {
+        result = result.filter(task => task.category.toLowerCase() === categoryValue);
+    }
+    renderCard(result);
+}
+
+function saveAndRender() {
+    localStorage.setItem("tasks", JSON.stringify(taskArray));
+    applyFilters();
+}
+
+addTaskBtn.addEventListener("click", handleInput);
+categoryFilter.addEventListener("change", applyFilters);
+
 renderCard();
-function addToLocalstorage() {
- localStorage.setItem("tasks",JSON.stringify(taskArray))   
-}
-addTaskBtn.addEventListener("click",handleInput);

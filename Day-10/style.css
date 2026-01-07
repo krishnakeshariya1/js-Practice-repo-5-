@@ -17,7 +17,6 @@ html,body{
     width: 60%;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
     gap: 3rem;
     background-color: white;
@@ -87,7 +86,14 @@ html,body{
     border-radius: 0.5rem;
     margin-left: 1.5rem;
 }
-
+.filterTaskContainer{
+    padding: 0 1.5rem;
+}
+.filterTaskContainer select{
+    padding: 0.4rem 0.6rem;
+    font-size: 1.5rem;
+    border-radius: 0.5rem;
+}
 .para{
     font-size: 2rem;
     font-weight: 700;
@@ -95,6 +101,10 @@ html,body{
 }
 .done{
     background-color: rgb(76, 232, 76);
+    
+}
+.done .doneBtn{
+    display: none;
 }
 .unDone{
     background-color: #444; 
