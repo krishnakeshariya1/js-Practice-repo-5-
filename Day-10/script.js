@@ -38,22 +38,23 @@ function renderCard(tasks = taskArray) {
 
     tasks.forEach(task => {
         html += `
-            <div class="task ${task.isDone ? "done" : "unDone"}">
-                <div class="rightContent">
+            <div class="task ${task.isDone ? "done" : "unDone"} " data-action="${task.id}">
+                <div class="rightContent" data-action="${task.name}">
                     <h3>${task.name}</h3>
                     <h4>${task.category}</h4>
                 </div>
                 <div class="leftContent">
-                    <button onclick="toggleDone(${task.id})" class="doneBtn">
+                    <button data-action="toggle">
                         ${task.isDone ? "Undo" : "Done"}
                     </button>
-                    <button onclick="deleteTask(${task.id})">Delete</button>
+                    <button data-action="delete" >Delete</button>
                 </div>
             </div>
         `;
     });
 
     taskContainer.innerHTML = html;
+
 }
 
 function deleteTask(id) {
@@ -92,5 +93,16 @@ function saveAndRender() {
 addTaskBtn.addEventListener("click", handleInput);
 categoryFilter.addEventListener("change", applyFilters);
 statusFilter.addEventListener("change", applyFilters);
+taskContainer.addEventListener("click", (e) => {
+    const action = e.target.dataset.action;
+    if (!action) return;
 
+    const taskEl = e.target.closest(".task");
+    if (!taskEl) return;
+
+    const taskId = Number(taskEl.dataset.action);
+
+    if (action === "toggle") toggleDone(taskId);
+    if (action === "delete") deleteTask(taskId);
+});
 renderCard();

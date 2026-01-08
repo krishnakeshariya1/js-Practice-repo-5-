@@ -112,9 +112,6 @@ html,body{
     background-color: rgb(76, 232, 76);
     
 }
-.done .doneBtn{
-    display: none;
-}
 .unDone{
     background-color: #444; 
 }
