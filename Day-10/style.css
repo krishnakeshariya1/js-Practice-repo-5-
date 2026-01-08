@@ -88,6 +88,15 @@ html,body{
 }
 .filterTaskContainer{
     padding: 0 1.5rem;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+.filterTaskContainer .catg, .status{
+    display: flex;
+    align-items: center;
+    gap: 2rem;
 }
 .filterTaskContainer select{
     padding: 0.4rem 0.6rem;

@@ -4,6 +4,7 @@ const inputCategory = document.querySelector("#taskCategory");
 const addTaskBtn = document.querySelector("#addTaskBtn");
 const taskContainer = document.querySelector(".taskContainer");
 const categoryFilter = document.querySelector("#filterCategory");
+const statusFilter = document.querySelector("#filterStatus");
 
 let taskArray = JSON.parse(localStorage.getItem("tasks")) || [];
 
@@ -70,9 +71,15 @@ function applyFilters() {
     let result = [...taskArray];
 
     const categoryValue = categoryFilter.value.toLowerCase();
+    const status = statusFilter.value.toLowerCase();
 
     if (categoryValue !== "all") {
         result = result.filter(task => task.category.toLowerCase() === categoryValue);
+    }
+    if (categoryValue !== "all") {
+        result = result.filter(task => {
+            return status === "completed" ? task.isDone : !task.isDone;
+        })
     }
     renderCard(result);
 }
@@ -84,5 +91,6 @@ function saveAndRender() {
 
 addTaskBtn.addEventListener("click", handleInput);
 categoryFilter.addEventListener("change", applyFilters);
+statusFilter.addEventListener("change", applyFilters);
 
 renderCard();
