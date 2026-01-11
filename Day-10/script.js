@@ -1,3 +1,4 @@
+
 // ===== DOM REFERENCES =====
 const inputName = document.querySelector("#taskName");
 const inputCategory = document.querySelector("#taskCategory");
@@ -7,6 +8,7 @@ const categoryFilter = document.querySelector("#filterCategory");
 const statusFilter = document.querySelector("#filterStatus");
 
 let taskArray = JSON.parse(localStorage.getItem("tasks")) || [];
+let editingTaskId = null;
 
 function handleInput() {
     const name = inputName.value.trim();
@@ -37,11 +39,26 @@ function renderCard(tasks = taskArray) {
     let html = "";
 
     tasks.forEach(task => {
+        const isEditing = task.id === editingTaskId;
         html += `
             <div class="task ${task.isDone ? "done" : "unDone"} " data-action="${task.id}">
-                <div class="rightContent" data-action="${task.name}">
-                    <h3>${task.name}</h3>
-                    <h4>${task.category}</h4>
+                <div class="rightContent">
+                    ${isEditing
+                ? `
+                <input class="editName" value="${task.name}">
+                <select class="editCategory">
+                    <option value="work" ${task.category === "work" ? "selected" : ""} >Work</option>
+                    <option value="personal" ${task.category === "personal" ? "selected" : ""} >Personal</option>
+                </select>
+                <button data-action="save">Save</button>
+                <button data-action="cancel">Cancel</button>
+              `
+                : `
+                <h3>${task.name}</h3>
+                <h4>${task.category}</h4>
+                <button data-action="edit">Edit</button>
+              `
+            } 
                 </div>
                 <div class="leftContent">
                     <button data-action="toggle">
@@ -100,8 +117,32 @@ taskContainer.addEventListener("click", (e) => {
     const taskEl = e.target.closest(".task");
     if (!taskEl) return;
 
+
     const taskId = Number(taskEl.dataset.action);
 
+    if (action === "edit") {
+        editingTaskId = taskId;
+        renderCard();
+    }
+    if (action === "cancel") {
+        editingTaskId = null;
+        renderCard()
+    }
+    if (action === "save") {
+        const newName = taskEl.querySelector(".editName").value.trim();
+        const newCategory = taskEl.querySelector(".editCategory").value;
+
+          if (!newName) return;
+
+          const task = taskArray.find(t=> t.id === taskId)
+
+          if (task) {
+            task.name = newName;
+            task.category = newCategory;
+          }
+        editingTaskId = null;
+        saveAndRender()  
+    }
     if (action === "toggle") toggleDone(taskId);
     if (action === "delete") deleteTask(taskId);
 });
