@@ -50,21 +50,27 @@ function renderCard(tasks = taskArray) {
                     <option value="work" ${task.category === "work" ? "selected" : ""} >Work</option>
                     <option value="personal" ${task.category === "personal" ? "selected" : ""} >Personal</option>
                 </select>
-                <button data-action="save">Save</button>
-                <button data-action="cancel">Cancel</button>
               `
                 : `
                 <h3>${task.name}</h3>
                 <h4>${task.category}</h4>
-                <button data-action="edit">Edit</button>
               `
             } 
                 </div>
                 <div class="leftContent">
-                    <button data-action="toggle">
-                        ${task.isDone ? "Undo" : "Done"}
-                    </button>
-                    <button data-action="delete" >Delete</button>
+                   ${isEditing
+                ? `
+                            <button data-action="save">Save</button>
+                            <button data-action="cancel">Cancel</button>
+                          `
+                : `
+                            <button data-action="toggle">
+                                ${task.isDone ? "Undo" : "Done"}
+                            </button>
+                            <button data-action="edit">Edit</button>
+                            <button data-action="delete">Delete</button>
+                          `
+            }
                 </div>
             </div>
         `;
@@ -132,16 +138,16 @@ taskContainer.addEventListener("click", (e) => {
         const newName = taskEl.querySelector(".editName").value.trim();
         const newCategory = taskEl.querySelector(".editCategory").value;
 
-          if (!newName) return;
+        if (!newName) return;
 
-          const task = taskArray.find(t=> t.id === taskId)
+        const task = taskArray.find(t => t.id === taskId)
 
-          if (task) {
+        if (task) {
             task.name = newName;
             task.category = newCategory;
-          }
+        }
         editingTaskId = null;
-        saveAndRender()  
+        saveAndRender()
     }
     if (action === "toggle") toggleDone(taskId);
     if (action === "delete") deleteTask(taskId);
