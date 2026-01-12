@@ -9,22 +9,26 @@
 </head>
 
 <body>
+    <div class="createTaskContainer">
+        <input type="text" id="taskName" placeholder="Enter Task Name ">
+        <input type="text" id="taskCategory" placeholder="Enter Task Category">
+        <button id="addTaskBtn">Add Task</button>
+    </div>
     <div class="main">
-        <div class="createTaskContainer" >
-            <input type="text" id="taskName" placeholder="Enter Task Name ">
-            <input type="text" id="taskCategory" placeholder="Enter Task Category">
-            <button id="addTaskBtn">Add Task</button>
+        <div class="searchContainer">
+            <input type="text" id="searchBar" placeholder="Search Task...">
+            <button class="searchBtn">Search</button>
         </div>
         <div class="filterTaskContainer">
-           <div class="catg">
-             <p>Filter by Category :</p>  
-            <select id="filterCategory" >
-                <option value="all">All</option>
-                <option value="study">study</option>
-                <option value="routine">Routine</option>
-                <option value="purchase">purchase</option>
-            </select>
-           </div>
+            <div class="catg">
+                <p>Filter by Category :</p>
+                <select id="filterCategory">
+                    <option value="all">All</option>
+                    <option value="study">study</option>
+                    <option value="routine">Routine</option>
+                    <option value="purchase">purchase</option>
+                </select>
+            </div>
             <div class="status">
                 <p>Filter by status :</p>
                 <select id="filterStatus">
@@ -32,8 +36,8 @@
                     <option value="notCompleted">Not completed</option>
                 </select>
             </div>
-        </div> 
-          
+        </div>
+
         <div class="taskContainer">
         </div>
     </div>

@@ -9,8 +9,10 @@ html,body{
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-size: 62.5%;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 2rem;
     background-color: rgb(243, 241, 237);
 }
 .main{
@@ -23,13 +25,13 @@ html,body{
     border-radius: 1rem;
 }
 .createTaskContainer{
-    padding: 0.7rem 1rem;
-    width: 100%;
+    width: 60%;
+    padding: 2rem 1rem;
+    background-color: white;
     border-radius: 1rem;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-
+    align-items: center;
 }
 .createTaskContainer input{
     width: 35rem;
@@ -42,8 +44,31 @@ html,body{
     font-weight: 600;
     padding: 0.5rem 0.8rem;
     border-radius: 0.8rem;
-    background-color: rgb(54, 211, 54);
+    background-color: rgb(138, 138, 138);
+    color: white;
     border: none;
+}
+.main .searchContainer{
+    width: 100%;
+    padding: 0.8rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+.main .searchContainer input{
+    width: 35rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.5rem;
+    border: 1px solid black;
+    font-size: 1.6rem;
+}
+.main .searchContainer button{
+    padding: 0.5rem 0.8rem;
+    border-radius: 1rem;
+    background-color: #777;
+    border: none;
+    color: white;
+    font-size: 1.6rem;
 }
 .taskContainer{
     width: 100%;
