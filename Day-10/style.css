@@ -56,18 +56,10 @@ html,body{
     justify-content: space-around;
 }
 .main .searchContainer input{
-    width: 35rem;
+    width: 40rem;
     padding: 0.3rem 0.6rem;
     border-radius: 0.5rem;
     border: 1px solid black;
-    font-size: 1.6rem;
-}
-.main .searchContainer button{
-    padding: 0.5rem 0.8rem;
-    border-radius: 1rem;
-    background-color: #777;
-    border: none;
-    color: white;
     font-size: 1.6rem;
 }
 .taskContainer{

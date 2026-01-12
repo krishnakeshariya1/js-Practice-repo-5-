@@ -6,6 +6,7 @@ const addTaskBtn = document.querySelector("#addTaskBtn");
 const taskContainer = document.querySelector(".taskContainer");
 const categoryFilter = document.querySelector("#filterCategory");
 const statusFilter = document.querySelector("#filterStatus");
+const searchBar = document.querySelector("#searchBar");
 
 let taskArray = JSON.parse(localStorage.getItem("tasks")) || [];
 let editingTaskId = null;
@@ -48,6 +49,7 @@ function renderCard(tasks = taskArray) {
                 <input class="editName" value="${task.name}">
                 <select class="editCategory">
                     <option value="work" ${task.category === "work" ? "selected" : ""} >Work</option>
+                    <option value="purchase" ${task.category === "purchase" ? "selected" : ""} >Purchase</option>
                     <option value="personal" ${task.category === "personal" ? "selected" : ""} >Personal</option>
                 </select>
               `
@@ -80,6 +82,7 @@ function renderCard(tasks = taskArray) {
 
 }
 
+
 function deleteTask(id) {
     taskArray = taskArray.filter(task => task.id !== id);
     saveAndRender();
@@ -96,6 +99,7 @@ function applyFilters() {
 
     const categoryValue = categoryFilter.value.toLowerCase();
     const status = statusFilter.value.toLowerCase();
+    const searchVal = searchBar.value.trim().toLowerCase();
 
     if (categoryValue !== "all") {
         result = result.filter(task => task.category.toLowerCase() === categoryValue);
@@ -105,13 +109,31 @@ function applyFilters() {
             return status === "completed" ? task.isDone : !task.isDone;
         })
     }
-    renderCard(result);
+    if (searchVal) {
+        result = result.filter(t => {
+            return t.name.toLowerCase().includes(searchVal);
+        })
+    }
+    return result
+}
+function getFilterTask() {
+    const filteredTasks = applyFilters();
+    renderCard(filteredTasks);
 }
 
+function debounce(fnc , delay = 400) {
+    let timer;
+    return function(...arg) {
+        clearTimeout(timer)
+        timer = setTimeout(()=> fnc.apply(this, arg),delay);
+    };
+}
 function saveAndRender() {
     localStorage.setItem("tasks", JSON.stringify(taskArray));
-    applyFilters();
+    getFilterTask();
 }
+
+const debouncedSearch = debounce(getFilterTask);
 
 addTaskBtn.addEventListener("click", handleInput);
 categoryFilter.addEventListener("change", applyFilters);
@@ -152,4 +174,5 @@ taskContainer.addEventListener("click", (e) => {
     if (action === "toggle") toggleDone(taskId);
     if (action === "delete") deleteTask(taskId);
 });
+searchBar.addEventListener("input", debouncedSearch)
 renderCard();
