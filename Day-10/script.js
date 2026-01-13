@@ -28,6 +28,7 @@ function handleInput() {
     saveAndRender();
 
     inputName.value = "";
+    inputCategory.value= "";
     inputCategory.selectedIndex = 0;
 }
 
@@ -42,7 +43,7 @@ function renderCard(tasks = taskArray) {
     tasks.forEach(task => {
         const isEditing = task.id === editingTaskId;
         html += `
-            <div class="task ${task.isDone ? "done" : "unDone"} " data-action="${task.id}">
+            <div class="task ${task.isDone ? "done" : "unDone"} " data-id="${task.id}">
                 <div class="rightContent">
                     ${isEditing
                 ? `
@@ -79,9 +80,7 @@ function renderCard(tasks = taskArray) {
     });
 
     taskContainer.innerHTML = html;
-
 }
-
 
 function deleteTask(id) {
     taskArray = taskArray.filter(task => task.id !== id);
@@ -116,21 +115,44 @@ function applyFilters() {
     }
     return result
 }
+
 function getFilterTask() {
     const filteredTasks = applyFilters();
     renderCard(filteredTasks);
 }
 
-function debounce(fnc , delay = 400) {
+function debounce(fnc, delay = 400) {
     let timer;
-    return function(...arg) {
+    return function (...arg) {
         clearTimeout(timer)
-        timer = setTimeout(()=> fnc.apply(this, arg),delay);
+        timer = setTimeout(() => fnc.apply(this, arg), delay);
     };
 }
+
 function saveAndRender() {
     localStorage.setItem("tasks", JSON.stringify(taskArray));
     getFilterTask();
+}
+
+function handleGlobalKeys(e) {
+    const activeTag = document.activeElement.tagName;
+
+    if (activeTag === "Escape" && editingTaskId !== null) {
+        editingTaskId = null;
+        getFilterTask()
+    }
+
+    if (activeTag === "INPUT" || activeTag === "SELECT") return;
+
+    if (e.key === "/") {
+        e.preventDefault();
+        searchBar.focus();
+    }
+
+    if (e.key === "Escape" && editingTaskId !== null) {
+        editingTaskId = null;
+        getFilterTask();
+    }
 }
 
 const debouncedSearch = debounce(getFilterTask);
@@ -138,6 +160,8 @@ const debouncedSearch = debounce(getFilterTask);
 addTaskBtn.addEventListener("click", handleInput);
 categoryFilter.addEventListener("change", applyFilters);
 statusFilter.addEventListener("change", applyFilters);
+searchBar.addEventListener("input", debouncedSearch);
+document.addEventListener("keydown", handleGlobalKeys);
 taskContainer.addEventListener("click", (e) => {
     const action = e.target.dataset.action;
     if (!action) return;
@@ -146,7 +170,7 @@ taskContainer.addEventListener("click", (e) => {
     if (!taskEl) return;
 
 
-    const taskId = Number(taskEl.dataset.action);
+    const taskId = Number(taskEl.dataset.id);
 
     if (action === "edit") {
         editingTaskId = taskId;
@@ -174,5 +198,24 @@ taskContainer.addEventListener("click", (e) => {
     if (action === "toggle") toggleDone(taskId);
     if (action === "delete") deleteTask(taskId);
 });
-searchBar.addEventListener("input", debouncedSearch)
+taskContainer.addEventListener("keydown", (e) => {
+    console.log(e)
+    if (e.key !== "Enter") return;
+
+    if (editingTaskId === null) return;
+
+    const taskEl = e.target.closest(".task");
+    if (!taskEl) return;
+
+    const saveBtn = taskEl.querySelector(`[data-action="save"]`);
+    saveBtn?.click()
+})
 renderCard();
+
+[inputCategory, inputName].forEach((el)=>{
+    el.addEventListener("keydown",(e)=>{
+        if (e.key === "Enter") {
+            handleInput();
+        }
+    })
+})
