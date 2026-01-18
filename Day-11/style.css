@@ -1,0 +1,140 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html,body{
+    width: 100%;
+    height: 100vh;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 62.5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    background-color: rgb(243, 241, 237);
+}
+.main{
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3rem;
+    background-color: white;
+    border-radius: 1rem;
+}
+.createTaskContainer{
+    width: 60%;
+    padding: 2rem 1rem;
+    background-color: white;
+    border-radius: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.createTaskContainer input{
+    width: 35rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.5rem;
+}
+.createTaskContainer button{
+    width: 9rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    padding: 0.5rem 0.8rem;
+    border-radius: 0.8rem;
+    background-color: rgb(138, 138, 138);
+    color: white;
+    border: none;
+}
+.main .searchContainer{
+    width: 100%;
+    padding: 0.8rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+.main .searchContainer input{
+    width: 40rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.5rem;
+    border: 1px solid black;
+    font-size: 1.6rem;
+}
+.taskContainer{
+    width: 100%;
+    padding: 0.6rem 1.2rem;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+}
+.taskContainer .task{
+    height: 5rem;
+    width: 80%;
+    padding: 0.4rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 1rem;
+}
+.task .rightContent{
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 1.4rem;
+    color: white;
+}
+/* .task .rightContent h3{
+    font-size: 1.4rem;
+    color: white;
+}
+.task .rightContent h4{
+    font-size: 1rem;
+    color: white;
+} */
+.task .leftContent button{
+    padding: 0.3rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    margin-left: 1.5rem;
+}
+.task .rightContent button{
+    padding: 0.3rem 1rem;
+    border:  none;
+    border-radius:  0.5rem;
+    margin-left: 1.5rem;
+}
+.filterTaskContainer{
+    padding: 0 1.5rem;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+.filterTaskContainer .catg, .status{
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+.filterTaskContainer select{
+    padding: 0.4rem 0.6rem;
+    font-size: 1.5rem;
+    border-radius: 0.5rem;
+}
+.para{
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+}
+.done{
+    background-color: rgb(76, 232, 76);
+    
+}
+.unDone{
+    background-color: #444; 
+}
