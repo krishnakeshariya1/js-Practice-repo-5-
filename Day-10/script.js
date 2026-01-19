@@ -137,11 +137,6 @@ function saveAndRender() {
 function handleGlobalKeys(e) {
     const activeTag = document.activeElement.tagName;
 
-    if (activeTag === "Escape" && editingTaskId !== null) {
-        editingTaskId = null;
-        getFilterTask()
-    }
-
     if (activeTag === "INPUT" || activeTag === "SELECT") return;
 
     if (e.key === "/") {
@@ -154,6 +149,9 @@ function handleGlobalKeys(e) {
         getFilterTask();
     }
 }
+function updateTaskDom(params) {
+    
+}
 
 const debouncedSearch = debounce(getFilterTask);
 
@@ -162,6 +160,7 @@ categoryFilter.addEventListener("change", applyFilters);
 statusFilter.addEventListener("change", applyFilters);
 searchBar.addEventListener("input", debouncedSearch);
 document.addEventListener("keydown", handleGlobalKeys);
+
 taskContainer.addEventListener("click", (e) => {
     const action = e.target.dataset.action;
     if (!action) return;
@@ -210,6 +209,7 @@ taskContainer.addEventListener("keydown", (e) => {
     const saveBtn = taskEl.querySelector(`[data-action="save"]`);
     saveBtn?.click()
 })
+
 renderCard();
 
 [inputCategory, inputName].forEach((el)=>{
