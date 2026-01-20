@@ -21,10 +21,10 @@ function handleInput() {
         isDone: false
     };
 
-    tasks.push(task);
+    taskArray.push(task);
     saveTasks();
 
-    if (doesTaskMatchFilters(task)) {
+    if (checkFilter(task)) {
         taskContainer.appendChild(createTaskElement(task));
     }
 
@@ -73,6 +73,20 @@ function checkFilter(task) {
 
     if (category !== "all" && task.category !== category) return false;
     if (status === "completed" && !task.isDone) return false;
-    if (search && !task.name.toLowerCase().includes(search)) return false
+    if (search && !task.name.toLowerCase().includes(search)) return false;
+
+    return true;
+}
+function delteTaskById(id) {
+    taskArray = taskArray.filter( t => t.id !== id)
+    saveTasks()
+}
+function removeTaskElement(id) {
+    const el = taskContainer.querySelector(`.task[data-id="${id}"]`);
+    if (el) el.remove();
+}
+function delteTask(id) {
+    delteTaskById(id);
+    removeTaskElement(id);
 }
 
