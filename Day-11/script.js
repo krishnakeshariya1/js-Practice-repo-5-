@@ -28,6 +28,7 @@ function handleInput() {
         taskContainer.appendChild(createTaskElement(task));
     }
 
+    inputCategory.value = "";
     inputName.value = "";
     inputCategory.selectedIndex = 0;
 }
@@ -37,17 +38,19 @@ function createTaskElement(task) {
     div.dataset.id = task.id;
 
     div.innerHTML = `
-        <div class="rightContent">
+        <span class="rightContent">
             <h3>${task.name}</h3>
             <h4>${task.category}</h4>
-        </div>
-        <div class="leftContent">
+            <input class="task-name-input" hidden />
+            <input class="task-category-input" hidden />
+        </span>
+        <span class="leftContent">
             <button data-action="toggle">
                 ${task.isDone ? "Undo" : "Done"}
             </button>
             <button data-action="edit">Edit</button>
             <button data-action="delete">Delete</button>
-        </div>
+        </span>
     `;
 
     return div;
@@ -64,7 +67,7 @@ function renderTasks(taskList = taskArray) {
     taskContainer.appendChild(fragment);
 }
 function saveTasks() {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+    localStorage.setItem("tasks", JSON.stringify(taskArray));
 }
 function checkFilter(task) {
     const category = categoryFilter.value.toLowerCase()
@@ -78,8 +81,8 @@ function checkFilter(task) {
     return true;
 }
 function delteTaskById(id) {
-    taskArray = taskArray.filter( t => t.id !== id)
-    saveTasks()
+    taskArray = taskArray.filter(t => t.id !== id)
+    saveTasks();
 }
 function removeTaskElement(id) {
     const el = taskContainer.querySelector(`.task[data-id="${id}"]`);
@@ -89,4 +92,25 @@ function delteTask(id) {
     delteTaskById(id);
     removeTaskElement(id);
 }
+function startEdit(id) {
+    editingTaskId = id;
+    nameSpan.hidden = true;
+    nameInput.hidden = false;
 
+    const taskName = nam
+}
+renderTasks();
+addTaskBtn.addEventListener("click", handleInput);
+taskContainer.addEventListener("click", (e) => {
+
+    const action = e.target.dataset.action;
+    if (!action) return;
+
+    const el = e.target.closest(".task");
+    if (!el) return;
+
+    const id = Number(el.dataset.id);
+    if (action === "delete") delteTask(id);
+    if (action === "edit") startEdit(id);
+    if (action === "toggle") toogleTask(id);
+})
