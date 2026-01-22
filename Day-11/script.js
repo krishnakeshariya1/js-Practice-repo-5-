@@ -1,17 +1,54 @@
+
+const taskContainer = document.querySelector(".taskContainer");
 const inputName = document.querySelector("#taskName");
 const inputCategory = document.querySelector("#taskCategory");
-const addTaskBtn = document.querySelector("#addTaskBtn");
-const taskContainer = document.querySelector(".taskContainer");
-const categoryFilter = document.querySelector("#filterCategory");
-const statusFilter = document.querySelector("#filterStatus");
+const addBtn = document.querySelector("#addTaskBtn");
 const searchBar = document.querySelector("#searchBar");
 
-let taskArray = JSON.parse(localStorage.getItem("tasks")) || [];
+/* ---------- STATE ---------- */
+let taskStore = JSON.parse(localStorage.getItem("tasks")) || [];
 let editingTaskId = null;
 
-function handleInput() {
+/* ---------- UTILITIES ------- */
+function saveToStorage() {
+    localStorage.setItem("tasks", JSON.stringify(taskStore));
+}
+
+function createTaskElement(task) {
+    const taskEl = document.createElement("div");
+    taskEl.className = ` task ${task.isDone ? "done" : "unDone"}`;
+    taskEl.dataset.id = task.id;
+
+    taskEl.innerHTML = `
+    <span class="task-name">${task.name}</span>
+    <input class="task-name-input" hidden />
+
+    <span class="task-category">${task.category}</span>
+    <input class="task-category-input" hidden />
+
+    <button data-action="toggle">${task.isDone ? "Undo" : "Done"}</button>
+    <button data-action="edit">Edit</button>
+    <button data-action="save" hidden>Save</button>
+    <button data-action="cancel" hidden>Cancel</button>
+    <button data-action="delete">Delete</button>
+  `;
+
+    return taskEl;
+}
+function initialRender() {
+    const fragment = document.createDocumentFragment();
+
+    taskStore.forEach(task => {
+        fragment.appendChild(createTaskElement(task));
+    });
+
+    taskContainer.appendChild(fragment);
+}
+
+function addTask() {
     const name = inputName.value.trim();
     const category = inputCategory.value.trim().toLowerCase();
+
     if (!name || !category) return;
 
     const task = {
@@ -21,96 +58,32 @@ function handleInput() {
         isDone: false
     };
 
-    taskArray.push(task);
-    saveTasks();
+    taskStore.push(task);
+    saveToStorage();
 
-    if (checkFilter(task)) {
-        taskContainer.appendChild(createTaskElement(task));
-    }
+    taskContainer.appendChild(createTaskElement(task));
 
-    inputCategory.value = "";
     inputName.value = "";
-    inputCategory.selectedIndex = 0;
+    inputCategory.value = "";
 }
-function createTaskElement(task) {
-    const div = document.createElement("div");
-    div.className = `task ${task.isDone ? "done" : "unDone"}`;
-    div.dataset.id = task.id;
 
-    div.innerHTML = `
-        <span class="rightContent">
-            <h3>${task.name}</h3>
-            <h4>${task.category}</h4>
-            <input class="task-name-input" hidden />
-            <input class="task-category-input" hidden />
-        </span>
-        <span class="leftContent">
-            <button data-action="toggle">
-                ${task.isDone ? "Undo" : "Done"}
-            </button>
-            <button data-action="edit">Edit</button>
-            <button data-action="delete">Delete</button>
-        </span>
-    `;
+function toggleTask(taskEl, taskId) {
+    const task = taskStore.find(t => t.id === taskId);
+    if (!task) return;
 
-    return div;
+    task.isDone = !task.isDone;
+
+    taskEl.classList.toggle("done", task.isDone);
+    taskEl.classList.toggle("unDone", !task.isDone);
+    taskEl.querySelector('[data-action="toggle"]').textContent =
+        task.isDone ? "Undo" : "Done";
+
+    saveToStorage();
 }
-function renderTasks(taskList = taskArray) {
-    taskContainer.innerHTML = "";
 
-    const fragment = document.createDocumentFragment();
-
-    taskList.forEach(task => {
-        fragment.appendChild(createTaskElement(task));
-    });
-
-    taskContainer.appendChild(fragment);
+function deleteTask(taskEl, taskId) {
+    taskStore = taskStore.filter(t => t.id !== taskId);
+    saveToStorage();
+    taskEl.remove();
 }
-function saveTasks() {
-    localStorage.setItem("tasks", JSON.stringify(taskArray));
-}
-function checkFilter(task) {
-    const category = categoryFilter.value.toLowerCase()
-    const status = statusFilter.value.toLowerCase();
-    const search = searchBar.value.trim().toLowerCase();
 
-    if (category !== "all" && task.category !== category) return false;
-    if (status === "completed" && !task.isDone) return false;
-    if (search && !task.name.toLowerCase().includes(search)) return false;
-
-    return true;
-}
-function delteTaskById(id) {
-    taskArray = taskArray.filter(t => t.id !== id)
-    saveTasks();
-}
-function removeTaskElement(id) {
-    const el = taskContainer.querySelector(`.task[data-id="${id}"]`);
-    if (el) el.remove();
-}
-function delteTask(id) {
-    delteTaskById(id);
-    removeTaskElement(id);
-}
-function startEdit(id) {
-    editingTaskId = id;
-    nameSpan.hidden = true;
-    nameInput.hidden = false;
-
-    const taskName = nam
-}
-renderTasks();
-addTaskBtn.addEventListener("click", handleInput);
-taskContainer.addEventListener("click", (e) => {
-
-    const action = e.target.dataset.action;
-    if (!action) return;
-
-    const el = e.target.closest(".task");
-    if (!el) return;
-
-    const id = Number(el.dataset.id);
-    if (action === "delete") delteTask(id);
-    if (action === "edit") startEdit(id);
-    if (action === "toggle") toogleTask(id);
-})

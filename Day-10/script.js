@@ -1,5 +1,6 @@
-
-// ===== DOM REFERENCES =====
+// ======================
+// DOM REFERENCES
+// ======================
 const inputName = document.querySelector("#taskName");
 const inputCategory = document.querySelector("#taskCategory");
 const addTaskBtn = document.querySelector("#addTaskBtn");
@@ -8,214 +9,241 @@ const categoryFilter = document.querySelector("#filterCategory");
 const statusFilter = document.querySelector("#filterStatus");
 const searchBar = document.querySelector("#searchBar");
 
+
 let taskArray = JSON.parse(localStorage.getItem("tasks")) || [];
 let editingTaskId = null;
 
-function handleInput() {
-    const name = inputName.value.trim();
-    const category = inputCategory.value.trim().toLowerCase();
 
-    if (!name || !category) return;
-
-    const task = {
-        id: Date.now(),
-        name,
-        category,
-        isDone: false
-    };
-
-    taskArray.push(task);
-    saveAndRender();
-
-    inputName.value = "";
-    inputCategory.value= "";
-    inputCategory.selectedIndex = 0;
+function saveToLocalStorage() {
+  localStorage.setItem("tasks", JSON.stringify(taskArray));
 }
 
-function renderCard(tasks = taskArray) {
-    if (tasks.length === 0) {
-        taskContainer.innerHTML = `<p class="para">No tasks found</p>`;
-        return;
-    }
-
-    let html = "";
-
-    tasks.forEach(task => {
-        const isEditing = task.id === editingTaskId;
-        html += `
-            <div class="task ${task.isDone ? "done" : "unDone"} " data-id="${task.id}">
-                <div class="rightContent">
-                    ${isEditing
-                ? `
-                <input class="editName" value="${task.name}">
-                <select class="editCategory">
-                    <option value="work" ${task.category === "work" ? "selected" : ""} >Work</option>
-                    <option value="purchase" ${task.category === "purchase" ? "selected" : ""} >Purchase</option>
-                    <option value="personal" ${task.category === "personal" ? "selected" : ""} >Personal</option>
-                </select>
-              `
-                : `
-                <h3>${task.name}</h3>
-                <h4>${task.category}</h4>
-              `
-            } 
-                </div>
-                <div class="leftContent">
-                   ${isEditing
-                ? `
-                            <button data-action="save">Save</button>
-                            <button data-action="cancel">Cancel</button>
-                          `
-                : `
-                            <button data-action="toggle">
-                                ${task.isDone ? "Undo" : "Done"}
-                            </button>
-                            <button data-action="edit">Edit</button>
-                            <button data-action="delete">Delete</button>
-                          `
-            }
-                </div>
-            </div>
-        `;
-    });
-
-    taskContainer.innerHTML = html;
+function debounce(fn, delay = 300) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
 }
+
+function handleAddTask() {
+  const name = inputName.value.trim();
+  const category = inputCategory.value.trim().toLowerCase();
+
+  if (!name || !category) return;
+
+  taskArray.push({
+    id: Date.now(),
+    name,
+    category,
+    isDone: false
+  });
+
+  saveToLocalStorage();
+  applyAndRender();
+
+  inputName.value = "";
+  inputCategory.selectedIndex = 0;
+}
+
+function getFilteredTasks() {
+  let result = [...taskArray];
+
+  const category = categoryFilter.value.toLowerCase();
+  const status = statusFilter.value.toLowerCase();
+  const search = searchBar.value.trim().toLowerCase();
+
+  if (category !== "all") {
+    result = result.filter(t => t.category === category);
+  }
+
+  if (status !== "all") {
+    result = result.filter(t =>
+      status === "completed" ? t.isDone : !t.isDone
+    );
+  }
+
+  if (search) {
+    result = result.filter(t =>
+      t.name.toLowerCase().includes(search)
+    );
+  }
+
+  return result;
+}
+
+function renderTasks(tasks) {
+  taskContainer.innerHTML = "";
+
+  if (tasks.length === 0) {
+    taskContainer.innerHTML = `<p class="para">No tasks found</p>`;
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+
+  tasks.forEach(task => {
+    fragment.appendChild(createTaskNode(task));
+  });
+
+  taskContainer.appendChild(fragment);
+}
+
+function applyAndRender() {
+  renderTasks(getFilteredTasks());
+}
+
+function createTaskNode(task) {
+  const taskEl = document.createElement("div");
+  taskEl.className = `task ${task.isDone ? "done" : "undone"}`;
+  taskEl.dataset.id = task.id;
+
+  taskEl.innerHTML = `
+    <span class="task-name">${task.name}</span>
+    <input class="task-name-input" hidden />
+
+    <span class="task-category">${task.category}</span>
+    <input class="task-category-input" hidden />
+
+    <button data-action="toggle">${task.isDone ? "Undo" : "Done"}</button>
+    <button data-action="edit">Edit</button>
+    <button data-action="save" hidden>Save</button>
+    <button data-action="cancel" hidden>Cancel</button>
+    <button data-action="delete">Delete</button>
+  `;
+
+  return taskEl;
+}
+
+taskContainer.addEventListener("click", e => {
+  const action = e.target.dataset.action;
+  if (!action) return;
+
+  const taskEl = e.target.closest(".task");
+  if (!taskEl) return;
+
+  const taskId = Number(taskEl.dataset.id);
+
+  if (action === "edit") enterEditMode(taskEl, taskId);
+  if (action === "save") saveEdit(taskEl, taskId);
+  if (action === "cancel") exitEditMode(taskEl);
+  if (action === "delete") deleteTask(taskId);
+  if (action === "toggle") toggleTask(taskId);
+});
+
+
+function enterEditMode(taskEl, taskId) {
+  if (editingTaskId !== null) return;
+
+  editingTaskId = taskId;
+
+  const nameSpan = taskEl.querySelector(".task-name");
+  const nameInput = taskEl.querySelector(".task-name-input");
+
+  const categorySpan = taskEl.querySelector(".task-category");
+  const categoryInput = taskEl.querySelector(".task-category-input");
+
+  nameInput.value = nameSpan.textContent;
+  categoryInput.value = categorySpan.textContent;
+
+  nameSpan.hidden = true;
+  categorySpan.hidden = true;
+
+  nameInput.hidden = false;
+  categoryInput.hidden = false;
+
+  toggleButtons(taskEl, true);
+
+  nameInput.focus();
+}
+
+function saveEdit(taskEl, taskId) {
+  const nameInput = taskEl.querySelector(".task-name-input");
+  const categoryInput = taskEl.querySelector(".task-category-input");
+
+  const newName = nameInput.value.trim();
+  const newCategory = categoryInput.value.trim().toLowerCase();
+
+  if (!newName) return;
+
+  const task = taskArray.find(t => t.id === taskId);
+  task.name = newName;
+  task.category = newCategory;
+
+  taskEl.querySelector(".task-name").textContent = newName;
+  taskEl.querySelector(".task-category").textContent = newCategory;
+
+  exitEditMode(taskEl);
+  saveToLocalStorage();
+}
+
+function exitEditMode(taskEl) {
+  editingTaskId = null;
+
+  taskEl.querySelector(".task-name").hidden = false;
+  taskEl.querySelector(".task-category").hidden = false;
+
+  taskEl.querySelector(".task-name-input").hidden = true;
+  taskEl.querySelector(".task-category-input").hidden = true;
+
+  toggleButtons(taskEl, false);
+}
+
+function toggleButtons(taskEl, isEditing) {
+  taskEl.querySelector('[data-action="edit"]').hidden = isEditing;
+  taskEl.querySelector('[data-action="save"]').hidden = !isEditing;
+  taskEl.querySelector('[data-action="cancel"]').hidden = !isEditing;
+}
+
 
 function deleteTask(id) {
-    taskArray = taskArray.filter(task => task.id !== id);
-    saveAndRender();
+  taskArray = taskArray.filter(t => t.id !== id);
+  saveToLocalStorage();
+  applyAndRender();
 }
 
-function toggleDone(id) {
-    const task = taskArray.find(task => task.id === id);
-    if (task) task.isDone = !task.isDone;
-    saveAndRender();
+function toggleTask(id) {
+  const task = taskArray.find(t => t.id === id);
+  task.isDone = !task.isDone;
+  saveToLocalStorage();
+  applyAndRender();
 }
 
-function applyFilters() {
-    let result = [...taskArray];
+taskContainer.addEventListener("keydown", e => {
+  if (e.key !== "Enter") return;
+  if (editingTaskId === null) return;
 
-    const categoryValue = categoryFilter.value.toLowerCase();
-    const status = statusFilter.value.toLowerCase();
-    const searchVal = searchBar.value.trim().toLowerCase();
-
-    if (categoryValue !== "all") {
-        result = result.filter(task => task.category.toLowerCase() === categoryValue);
-    }
-    if (categoryValue !== "all") {
-        result = result.filter(task => {
-            return status === "completed" ? task.isDone : !task.isDone;
-        })
-    }
-    if (searchVal) {
-        result = result.filter(t => {
-            return t.name.toLowerCase().includes(searchVal);
-        })
-    }
-    return result
-}
-
-function getFilterTask() {
-    const filteredTasks = applyFilters();
-    renderCard(filteredTasks);
-}
-
-function debounce(fnc, delay = 400) {
-    let timer;
-    return function (...arg) {
-        clearTimeout(timer)
-        timer = setTimeout(() => fnc.apply(this, arg), delay);
-    };
-}
-
-function saveAndRender() {
-    localStorage.setItem("tasks", JSON.stringify(taskArray));
-    getFilterTask();
-}
-
-function handleGlobalKeys(e) {
-    const activeTag = document.activeElement.tagName;
-
-    if (activeTag === "INPUT" || activeTag === "SELECT") return;
-
-    if (e.key === "/") {
-        e.preventDefault();
-        searchBar.focus();
-    }
-
-    if (e.key === "Escape" && editingTaskId !== null) {
-        editingTaskId = null;
-        getFilterTask();
-    }
-}
-function updateTaskDom(params) {
-    
-}
-
-const debouncedSearch = debounce(getFilterTask);
-
-addTaskBtn.addEventListener("click", handleInput);
-categoryFilter.addEventListener("change", applyFilters);
-statusFilter.addEventListener("change", applyFilters);
-searchBar.addEventListener("input", debouncedSearch);
-document.addEventListener("keydown", handleGlobalKeys);
-
-taskContainer.addEventListener("click", (e) => {
-    const action = e.target.dataset.action;
-    if (!action) return;
-
-    const taskEl = e.target.closest(".task");
-    if (!taskEl) return;
-
-
-    const taskId = Number(taskEl.dataset.id);
-
-    if (action === "edit") {
-        editingTaskId = taskId;
-        renderCard();
-    }
-    if (action === "cancel") {
-        editingTaskId = null;
-        renderCard()
-    }
-    if (action === "save") {
-        const newName = taskEl.querySelector(".editName").value.trim();
-        const newCategory = taskEl.querySelector(".editCategory").value;
-
-        if (!newName) return;
-
-        const task = taskArray.find(t => t.id === taskId)
-
-        if (task) {
-            task.name = newName;
-            task.category = newCategory;
-        }
-        editingTaskId = null;
-        saveAndRender()
-    }
-    if (action === "toggle") toggleDone(taskId);
-    if (action === "delete") deleteTask(taskId);
+  const taskEl = e.target.closest(".task");
+  taskEl?.querySelector('[data-action="save"]')?.click();
 });
-taskContainer.addEventListener("keydown", (e) => {
-    console.log(e)
-    if (e.key !== "Enter") return;
 
-    if (editingTaskId === null) return;
+document.addEventListener("keydown", e => {
+  if (e.key === "/" && document.activeElement.tagName !== "INPUT") {
+    e.preventDefault();
+    searchBar.focus();
+  }
 
-    const taskEl = e.target.closest(".task");
-    if (!taskEl) return;
+  if (e.key === "Escape" && editingTaskId !== null) {
+    const taskEl = document.querySelector(
+      `.task[data-id="${editingTaskId}"]`
+    );
+    taskEl && exitEditMode(taskEl);
+  }
+});
 
-    const saveBtn = taskEl.querySelector(`[data-action="save"]`);
-    saveBtn?.click()
-})
 
-renderCard();
+categoryFilter.addEventListener("change", applyAndRender);
+statusFilter.addEventListener("change", applyAndRender);
+searchBar.addEventListener("input", debounce(applyAndRender));
 
-[inputCategory, inputName].forEach((el)=>{
-    el.addEventListener("keydown",(e)=>{
-        if (e.key === "Enter") {
-            handleInput();
-        }
-    })
-})
+
+addTaskBtn.addEventListener("click", handleAddTask);
+
+[inputName, inputCategory].forEach(el => {
+  el.addEventListener("keydown", e => {
+    if (e.key === "Enter") handleAddTask();
+  });
+});
+
+
+applyAndRender();
